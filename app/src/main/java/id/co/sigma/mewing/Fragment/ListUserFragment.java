@@ -1,6 +1,5 @@
 package id.co.sigma.mewing.Fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -31,9 +30,7 @@ import id.co.sigma.mewing.ViewModel.UserViewModel;
 public class ListUserFragment extends Fragment {
 
     private ListUserAdapter userAdapter;
-
     private RecyclerView userRecyclerView;
-
     private UserViewModel mUserViewModel;
 
     public ListUserFragment() {
@@ -49,10 +46,10 @@ public class ListUserFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
-        if(itemId == R.id.btn_new_user){
+        if (itemId == R.id.btn_new_user) {
             navigateToAddUser();
             return true;
-        }else {
+        } else {
             return super.onOptionsItemSelected(item);
         }
     }
@@ -63,6 +60,9 @@ public class ListUserFragment extends Fragment {
         UserRepository.initialize(requireContext());
         mUserViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         setHasOptionsMenu(true);
+
+        // Load initial user data
+        mUserViewModel.getAllUser();
     }
 
     @Override
@@ -76,13 +76,15 @@ public class ListUserFragment extends Fragment {
         userAdapter = new ListUserAdapter();
         userRecyclerView.setAdapter(userAdapter);
 
+        userAdapter.setOnItemClickListener(user -> navigateToUpdateUser(user));
+
         mUserViewModel.getAllUser();
         mUserViewModel.getAllUserResponse().observe(getViewLifecycleOwner(), new Observer<UserListVO>() {
             @Override
             public void onChanged(UserListVO userListVO) {
-                if(userListVO != null){
+                if (userListVO != null) {
                     userAdapter.setUserList(userListVO.getData());
-                }else {
+                } else {
                     userAdapter.setUserList(new ArrayList<>());
                 }
             }
@@ -91,14 +93,15 @@ public class ListUserFragment extends Fragment {
         return view;
     }
 
-    private class ListUserAdapter extends RecyclerView.Adapter<ListUserAdapter.ListUserHolder>{
+    private class ListUserAdapter extends RecyclerView.Adapter<ListUserAdapter.ListUserHolder> {
 
         private List<UserModel> userList = new ArrayList<>();
+        private OnItemClickListener onItemClickListener;
 
         @NonNull
         @Override
         public ListUserAdapter.ListUserHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_item_list_user, parent,false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.fragment_item_list_user, parent, false);
             return new ListUserHolder(view);
         }
 
@@ -113,13 +116,17 @@ public class ListUserFragment extends Fragment {
             return userList.size();
         }
 
-        public void setUserList(List<UserModel> userList){
+        public void setUserList(List<UserModel> userList) {
             this.userList.clear();
             this.userList.addAll(userList);
             notifyDataSetChanged();
         }
 
-        public class ListUserHolder extends RecyclerView.ViewHolder{
+        public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+            this.onItemClickListener = onItemClickListener;
+        }
+
+        public class ListUserHolder extends RecyclerView.ViewHolder {
 
             private TextView mTxtUsername, mTxtNama, mTxtJabatan;
 
@@ -128,20 +135,45 @@ public class ListUserFragment extends Fragment {
                 mTxtUsername = itemView.findViewById(R.id.txt_username);
                 mTxtNama = itemView.findViewById(R.id.txt_nama_user);
                 mTxtJabatan = itemView.findViewById(R.id.txt_jabatan);
+
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (onItemClickListener != null) {
+                            onItemClickListener.onItemClick(userList.get(getAdapterPosition()));
+                        }
+                    }
+                });
             }
 
-            public void bind(UserModel user){
+            public void bind(UserModel user) {
                 mTxtUsername.setText("Username : " + user.getUsername());
-                mTxtNama.setText("Nama : " +  user.getNama());
+                mTxtNama.setText("Nama : " + user.getNama());
                 mTxtJabatan.setText(user.getJabatan());
             }
         }
     }
 
-    private void navigateToAddUser(){
+    public interface OnItemClickListener {
+        void onItemClick(UserModel user);
+    }
+
+    private void navigateToAddUser() {
         Fragment addFragment = new CreateFragment();
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container_main, addFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    // Modifikasi di navigateToUpdateUser
+    private void navigateToUpdateUser(UserModel user) {
+        Fragment updateFragment = new UpdateFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("user", user);
+        updateFragment.setArguments(args);
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container_main, updateFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }

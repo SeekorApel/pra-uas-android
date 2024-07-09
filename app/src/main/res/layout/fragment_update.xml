@@ -54,14 +54,24 @@
 
     <Button
         android:id="@+id/btn_tambah"
-        android:layout_width="300dp"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="154dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="170dp"
+        android:layout_marginEnd="50dp"
         android:text="Update Data"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.45"
+        app:layout_constraintTop_toBottomOf="@+id/edt_jabatan" />
+
+    <Button
+        android:id="@+id/btn_hapus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="50dp"
+        android:text="Hapus"
+        app:layout_constraintEnd_toStartOf="@+id/btn_tambah"
+        app:layout_constraintHorizontal_bias="0.68"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edt_jabatan" />
 

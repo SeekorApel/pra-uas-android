@@ -59,13 +59,13 @@ public class LoginFragment extends Fragment {
                 mUserViewModel.getLoginResponse().observe(getViewLifecycleOwner(), new Observer<UserVO>() {
                     @Override
                     public void onChanged(UserVO userVO) {
-                        if(userVO != null){
-                            if(userVO.getData().getJabatan().equals("Customer")){
+                        if (userVO != null && userVO.getData() != null) {
+                            if ("Customer".equals(userVO.getData().getJabatan())) {
                                 Toast.makeText(getContext(), "Anda tidak memiliki akses", Toast.LENGTH_SHORT).show();
-                            } else if (userVO.getData().getJabatan().equals("Admin")) {
+                            } else if ("Admin".equals(userVO.getData().getJabatan())) {
                                 navigateToList();
                             }
-                        }else {
+                        } else {
                             Toast.makeText(getActivity(), "Login salah, Akun Tidak Ditemukan", Toast.LENGTH_SHORT).show();
                         }
 

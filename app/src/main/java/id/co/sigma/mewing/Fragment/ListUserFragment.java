@@ -1,9 +1,11 @@
 package id.co.sigma.mewing.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -48,7 +50,7 @@ public class ListUserFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if(itemId == R.id.btn_new_user){
-            //navigateToAddUser();
+            navigateToAddUser();
             return true;
         }else {
             return super.onOptionsItemSelected(item);
@@ -137,6 +139,10 @@ public class ListUserFragment extends Fragment {
     }
 
     private void navigateToAddUser(){
-
+        Fragment addFragment = new CreateFragment();
+        FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container_main, addFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }
